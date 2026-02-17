@@ -27,6 +27,7 @@ Alternatively, you can install it directly from GitHub:
 pip install git+[https://github.com/Tetramatrix/lemonade-python-sdk.git](https://github.com/Tetramatrix/lemonade-python-sdk.git)
 ```
 
+
 ## ⚡ Quick Start
 
 ### 1. Connecting to Lemonade
