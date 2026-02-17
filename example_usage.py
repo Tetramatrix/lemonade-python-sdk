@@ -3,9 +3,7 @@ Example of using the new Lemonade integration module
 """
 
 # Import the new Lemonade module
-from client import LemonadeClient
-from model_discovery import discover_lemonade_models
-from port_scanner import find_available_lemonade_port
+from lemonade_integration import LemonadeClient, discover_lemonade_models, find_available_lemonade_port
 
 def example_usage():
     """
@@ -53,14 +51,14 @@ def example_usage():
         print("❌ Lemonade server is not reachable")
 
 
-def example_model_discovery():
+def example_model_discovery(port=8000):
     """
     Shows how model discovery works
     """
-    print("\n=== Model Discovery Example ===")
+    print(f"\n=== Model Discovery Example on port {port} ===")
 
-    # Discover models on the default server
-    models = discover_lemonade_models("http://localhost:8000")
+    # Discover models on the specified server
+    models = discover_lemonade_models(f"http://localhost:{port}")
     print(f"Discovered models: {len(models)}")
 
     for model in models:
@@ -68,5 +66,13 @@ def example_model_discovery():
 
 
 if __name__ == "__main__":
+    # Find the port first
+    available_port = find_available_lemonade_port()
+    
     example_usage()
-    example_model_discovery()
+    
+    # Use the discovered port for model discovery
+    if available_port:
+        example_model_discovery(port=available_port)
+    else:
+        example_model_discovery()
