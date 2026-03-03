@@ -74,8 +74,8 @@ for m in models:
 client.load_model("Mistral-7B-v0.1")
 ```
 
-### 🖼️ Production Showcase: Sorana
-This SDK was extracted from the core engine of Sorana, a professional visual workspace for AI. It demonstrates the SDK's capability to handle complex, real-world requirements on AMD Ryzen AI hardware:
+### 🖼️ Production Showcase: [Sorana](https://tetramatrix.github.io/Sorana/)
+This SDK was extracted from the core engine of [Sorana](https://tetramatrix.github.io/Sorana/), a professional visual workspace for AI. It demonstrates the SDK's capability to handle complex, real-world requirements on AMD Ryzen AI hardware:
 
 * **Low Latency:** Powers sub-second response times for multi-model chat interfaces.
 * **Dynamic Workflows:** Manages the loading and unloading of 20+ different LLMs based on user activity to optimize local NPU/GPU memory.
