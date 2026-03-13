@@ -74,12 +74,21 @@ for m in models:
 client.load_model("Mistral-7B-v0.1")
 ```
 
-### 🖼️ Production Showcase: [Sorana](https://tetramatrix.github.io/Sorana/)
-This SDK was extracted from the core engine of [Sorana](https://tetramatrix.github.io/Sorana/), a professional visual workspace for AI. It demonstrates the SDK's capability to handle complex, real-world requirements on AMD Ryzen AI hardware:
+### 🖼️ Production Showcase: 
 
-* **Low Latency:** Powers sub-second response times for multi-model chat interfaces.
-* **Dynamic Workflows:** Manages the loading and unloading of 20+ different LLMs based on user activity to optimize local NPU/GPU memory.
-* **Zero-Config UX:** Uses the built-in port scanner to automatically connect the Sorana frontend to the Lemonade backend without user intervention.
+This SDK powers **3 real-world production applications**:
+
+[Sorana](https://tetramatrix.github.io/Sorana/) — AI Visual Workspace
+* SDK drives semantic AI grouping of files and folders onto a spatial 2D canvas
+* SDK handles auto-discovery and connection to local Lemonade instances (zero config)
+
+[Aicono](https://tetramatrix.github.io/Aicono/) — AI Desktop Icon Organizer *(Featured in [CHIP Magazine](https://www.chip.de/downloads/Aicono_186527264.html) 🇩🇪)*
+* SDK drives AI inference for grouping and categorizing desktop icons
+* Reached millions of readers via [CHIP](https://www.chip.de/downloads/Aicono_186527264.html), one of Germany's largest IT publications
+
+[TabNeuron](https://tetramatrix.github.io/TabNeuron/) — AI-Powered Tab Organizer
+* SDK enables local AI inference for grouping and categorizing browser tabs
+* Desktop companion app + browser extension, demonstrating SDK viability in lightweight client architectures
 
 ## 🛠️ Project Structure
 
