@@ -112,7 +112,7 @@ for item in response["data"]:
 ## 📚 Documentation
 * [Lemonade Server Docs](https://lemonade-server.ai/docs/server/server_spec/) - Official Lemonade documentation
 
-* 
+ 
 ### 🖼️ Production Showcase: 
 
 This SDK powers **3 real-world production applications**:
