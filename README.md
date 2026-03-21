@@ -15,6 +15,10 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 * **Type-Safe Client:** Full Python type hinting for better developer experience (IDE autocompletion).
 * **Model Management:** Simple API to load, unload, and list models dynamically.
 * **Embeddings API:** Generate text embeddings for semantic search, RAG, and clustering (FLM & llamacpp backends).
+* **Audio API:** Whisper speech-to-text and Kokoro text-to-speech.
+* **Reranking API:** Reorder documents by relevance for better RAG results.
+* **Image Generation:** Create images from text prompts using Stable Diffusion.
+* **WebSocket Streaming:** Real-time audio transcription with VAD.
 
 ## 📦 Installation
 
@@ -25,7 +29,7 @@ pip install .
 Alternatively, you can install it directly from GitHub:
 
 ```bash
-pip install git+[https://github.com/Tetramatrix/lemonade-python-sdk.git](https://github.com/Tetramatrix/lemonade-python-sdk.git)
+pip install git+https://github.com/Tetramatrix/lemonade-python-sdk.git
 ```
 
 ## ⚡ Quick Start
@@ -35,8 +39,7 @@ pip install git+[https://github.com/Tetramatrix/lemonade-python-sdk.git](https:/
 The SDK automatically handles port discovery, so you don't need to hardcode localhost:8000.
 
 ```python
-from lemonade_integration.client import LemonadeClient
-from lemonade_integration.port_scanner import find_available_lemonade_port
+from lemonade_sdk import LemonadeClient, find_available_lemonade_port
 
 # Auto-discover running instance
 port = find_available_lemonade_port()
@@ -74,6 +77,7 @@ for m in models:
 # Load a specific model into memory
 client.load_model("Mistral-7B-v0.1")
 ```
+
 ### 4. Embeddings (NEW)
 
 Generate text embeddings for semantic search, RAG pipelines, and clustering.
@@ -109,10 +113,186 @@ for item in response["data"]:
 - ✅ **llamacpp** (.GGUF models) - CPU/GPU
 - ❌ ONNX/OGA - Not supported
 
+### 5. Audio Transcription (Whisper) - NEW
+
+Transcribe audio files to text using Whisper.
+
+```python
+# List available audio models (Whisper + Kokoro)
+audio_models = client.list_audio_models()
+for model in audio_models:
+    print(f"Audio model: {model['id']}")
+
+# Transcribe an audio file
+result = client.transcribe_audio(
+    file_path="meeting.wav",
+    model="Whisper-Tiny",
+    language="en",  # Optional: None for auto-detection
+    response_format="json"  # Options: "json", "text", "verbose_json"
+)
+
+if "error" not in result:
+    print(f"Transcription: {result['text']}")
+    # Verbose format also includes: duration, language, segments
+```
+
+**Supported Models:**
+- `Whisper-Tiny` (~39M parameters)
+- `Whisper-Base` (~74M parameters)
+- `Whisper-Small` (~244M parameters)
+
+**Supported Formats:** WAV, MP3, FLAC, OGG, WebM
+
+**Backend:** whisper.cpp (NPU-accelerated on Windows)
+
+### 6. Text-to-Speech (Kokoro) - NEW
+
+Generate speech from text using Kokoro TTS.
+
+```python
+# Generate speech and save to file
+client.text_to_speech(
+    input_text="Hello, Lemonade can now speak!",
+    model="kokoro-v1",
+    voice="shimmer",  # Options: shimmer, corey, af_bella, am_adam, etc.
+    speed=1.0,  # 0.5 - 2.0
+    response_format="mp3",  # Options: mp3, wav, opus, pcm, aac, flac
+    output_file="speech.mp3"  # Saves directly to file
+)
+
+# Or get audio bytes directly
+audio_bytes = client.text_to_speech(
+    input_text="Short test!",
+    model="kokoro-v1",
+    voice="corey",
+    response_format="mp3"
+)
+
+with open("speech.mp3", "wb") as f:
+    f.write(audio_bytes)
+```
+
+**Supported Models:**
+- `kokoro-v1` (~82M parameters)
+
+**Available Voices:**
+
+| Voice ID | Language | Gender |
+|----------|----------|--------|
+| `shimmer` | EN | Female |
+| `corey` | EN | Male |
+| `af_bella`, `af_nicole` | EN-US | Female |
+| `am_adam`, `am_michael` | EN-US | Male |
+| `bf_emma`, `bf_isabella` | EN-GB | Female |
+| `bm_george`, `bm_lewis` | EN-GB | Male |
+
+**Audio Formats:** MP3, WAV, OPUS, PCM, AAC, FLAC
+
+**Backend:** Kokoros (.onnx, CPU)
+
+### 7. Reranking (NEW)
+
+Rerank documents based on relevance to a query.
+
+```python
+result = client.rerank(
+    query="What is the capital of France?",
+    documents=[
+        "Berlin is the capital of Germany.",
+        "Paris is the capital of France.",
+        "London is the capital of the UK."
+    ],
+    model="bge-reranker-v2-m3-GGUF"
+)
+
+# Results sorted by relevance score
+for r in result["results"]:
+    print(f"Rank {r['index']}: Score={r['relevance_score']:.2f}")
+```
+
+**Supported Models:**
+- `bge-reranker-v2-m3-GGUF`
+- Other BGE reranker models
+
+**Backend:** llamacpp (.GGUF only, not available for FLM or OGA)
+
+### 8. Image Generation (NEW)
+
+Generate images from text prompts using Stable Diffusion.
+
+```python
+# Generate and save to file
+client.generate_image(
+    prompt="A sunset over mountains with lake reflection",
+    model="SD-Turbo",
+    size="512x512",
+    steps=4,  # SD-Turbo needs only 4 steps
+    cfg_scale=1.0,
+    output_file="sunset.png"
+)
+
+# Or get image bytes
+image_bytes = client.generate_image(
+    prompt="A cute cat",
+    model="SD-Turbo"
+)
+```
+
+**Supported Models:**
+- `SD-Turbo` (fast, 4 steps)
+- `SDXL-Turbo` (fast, 4 steps)
+- `SD-1.5` (standard, 20 steps)
+- `SDXL-Base-1.0` (high quality, 20 steps)
+
+**Image Sizes:** 512x512, 1024x1024, or custom
+
+**Backend:** stable-diffusion.cpp
+
+### 9. WebSocket Streaming (NEW)
+
+Real-time audio transcription with Voice Activity Detection (VAD).
+
+```python
+from lemonade_sdk import WhisperWebSocketClient
+
+# Create streaming client
+stream = client.create_whisper_stream(model="Whisper-Tiny")
+stream.connect()
+
+# Set callback for transcriptions
+def on_transcript(text):
+    print(f"Heard: '{text}'")
+
+stream.on_transcription(on_transcript)
+
+# Stream audio file (PCM16, 16kHz, mono)
+for text in stream.stream("audio.pcm"):
+    pass  # Callback handles output
+
+# Or stream from microphone (requires pyaudio)
+# for text in stream.stream_microphone():
+#     print(f"Heard: {text}")
+
+stream.disconnect()
+```
+
+**Audio Format:** 16kHz, mono, PCM16 (16-bit)
+
+**Features:**
+- Voice Activity Detection (VAD)
+- Real-time streaming
+- Microphone support (with pyaudio)
+- Configurable sensitivity
+
+**Backend:** whisper.cpp (NPU-accelerated on Windows)
+
 ## 📚 Documentation
+
+* **[Embeddings API](docs/embeddings_api.md)** - Complete guide for using embeddings
+* **[Audio API](docs/audio_api.md)** - Whisper transcription and Kokoro TTS (documentation)
+* **[Implementation Plan](docs/AUDIO_IMPLEMENTATION.md)** - Audio API implementation roadmap
 * [Lemonade Server Docs](https://lemonade-server.ai/docs/server/server_spec/) - Official Lemonade documentation
 
- 
 ### 🖼️ Production Showcase: 
 
 This SDK powers **3 real-world production applications**:
@@ -131,10 +311,11 @@ This SDK powers **3 real-world production applications**:
 
 ## 🛠️ Project Structure
 
-* **client.py:** Main entry point for API interactions (chat, embeddings, model management).
+* **client.py:** Main entry point for API interactions (chat, embeddings, audio, reranking, images, model management).
 * **port_scanner.py:** Utilities for detecting Lemonade instances across ports (8000-9000).
 * **model_discovery.py:** Logic for fetching and parsing model metadata.
-* **request_builder.py:** Helper functions to construct compliant payloads (chat, embeddings).
+* **request_builder.py:** Helper functions to construct compliant payloads (chat, embeddings, audio, reranking, images).
+* **audio_stream.py:** WebSocket client for real-time audio transcription with VAD.
 * **utils.py:** Additional utility functions.
 
 ## 🤝 Contributing
