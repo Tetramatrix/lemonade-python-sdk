@@ -12,14 +12,14 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
     license_content = fh.read()
 
 setup(
-    name="lemonade-integration",
-    version="1.0.0",
+    name="lemonade-python-sdk",
+    version="1.0.1",
     author="Your Name",
     author_email="your.email@example.com",
     description="A clean interface for interacting with the Lemonade LLM server",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/lemonade-integration",
+    url="https://github.com/Tetramatrix/lemonade-python-sdk",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -43,9 +43,9 @@ setup(
             "flake8",
         ],
     },
-    keywords="llm, ai, lemonade, integration, api",
+    keywords="llm, ai, lemonade, sdk, api",
     project_urls={
-        "Bug Reports": "https://github.com/yourusername/lemonade-integration/issues",
-        "Source": "https://github.com/yourusername/lemonade-integration",
+        "Bug Reports": "https://github.com/Tetramatrix/lemonade-python-sdk/issues",
+        "Source": "https://github.com/Tetramatrix/lemonade-python-sdk",
     },
 )
