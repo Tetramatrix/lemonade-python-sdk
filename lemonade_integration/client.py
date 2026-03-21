@@ -5,7 +5,7 @@ LemonadeClient - Main class for interacting with the Lemonade server
 import requests
 import json
 from typing import Dict, List, Optional, Any
-from .request_builder import build_chat_completion_payload, send_request
+from .request_builder import build_chat_completion_payload, send_request, build_embedding_payload
 from .model_discovery import get_active_model
 
 
@@ -132,3 +132,46 @@ class LemonadeClient:
         except Exception as e:
             print(f"Error unloading model: {e}")
             return {"error": str(e)}
+
+    def embeddings(self, input: str, model: str, **kwargs) -> Dict[str, Any]:
+        """
+        Sends an embedding request to the Lemonade server.
+
+        Args:
+            input (str): The text or list of texts to embed
+            model (str): The name of the embedding model to use (e.g., "nomic-embed-text-v1-GGUF")
+            **kwargs: Additional parameters for the request
+                - encoding_format (str): "float" (default) or "base64"
+
+        Returns:
+            Dict[str, Any]: The response containing the embedding vectors
+        """
+        url = f"{self.base_url}/api/v1/embeddings"
+
+        payload = build_embedding_payload(input, model, **kwargs)
+
+        try:
+            response = send_request(url, payload, session=self.session)
+            return response
+        except Exception as e:
+            print(f"Error in embedding request: {e}")
+            return {"error": str(e)}
+
+    def list_embedding_models(self) -> List[Dict[str, Any]]:
+        """
+        Retrieves only the embedding models from the Lemonade server.
+        Filters models by the 'embeddings' label.
+
+        Returns:
+            List[Dict[str, Any]]: List of available embedding models
+        """
+        all_models = self.list_models()
+        
+        # Filter models that have the 'embeddings' label
+        embedding_models = []
+        for model in all_models:
+            labels = model.get("labels", [])
+            if labels and "embeddings" in labels:
+                embedding_models.append(model)
+        
+        return embedding_models

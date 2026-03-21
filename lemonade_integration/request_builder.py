@@ -64,7 +64,7 @@ def build_model_load_payload(model_name: str, **kwargs) -> Dict[str, Any]:
     return payload
 
 
-def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, str]] = None, session: Optional[requests.Session] = None) -> Dict[str, Any]:
+def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, str]] = None, session: Optional[requests.Session] = None, method: str = "POST") -> Dict[str, Any]:
     """
     Sends a request to the Lemonade server.
 
@@ -73,6 +73,7 @@ def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, 
         payload (Dict[str, Any]): The payload to send
         headers (Optional[Dict[str, str]]): Optional headers for the request
         session (Optional[requests.Session]): Optional session for the request
+        method (str): HTTP method to use ("POST" or "GET")
 
     Returns:
         Dict[str, Any]: The response from the server
@@ -86,7 +87,13 @@ def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, 
     req_session = session or requests.Session()
 
     try:
-        response = req_session.post(url, json=payload, headers=headers, timeout=30)
+        if method.upper() == "POST":
+            response = req_session.post(url, json=payload, headers=headers, timeout=30)
+        elif method.upper() == "GET":
+            response = req_session.get(url, headers=headers, timeout=30, params=payload if payload else None)
+        else:
+            return {"error": f"Unsupported HTTP method: {method}"}
+        
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as e:

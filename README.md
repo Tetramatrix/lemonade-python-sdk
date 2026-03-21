@@ -14,6 +14,7 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 * **Health Checks & Recovery:** Built-in utilities to verify server status and handle connection drops.
 * **Type-Safe Client:** Full Python type hinting for better developer experience (IDE autocompletion).
 * **Model Management:** Simple API to load, unload, and list models dynamically.
+* **Embeddings API:** Generate text embeddings for semantic search, RAG, and clustering (FLM & llamacpp backends).
 
 ## 📦 Installation
 
@@ -74,6 +75,41 @@ for m in models:
 client.load_model("Mistral-7B-v0.1")
 ```
 
+### 4. Embeddings (NEW)
+
+Generate text embeddings for semantic search, RAG pipelines, and clustering.
+
+```python
+# List available embedding models (filtered by 'embeddings' label)
+embedding_models = client.list_embedding_models()
+for model in embedding_models:
+    print(f"Embedding model: {model['id']}")
+
+# Generate embeddings for single text
+response = client.embeddings(
+    input="Hello, world!",
+    model="nomic-embed-text-v1-GGUF"
+)
+
+embedding_vector = response["data"][0]["embedding"]
+print(f"Vector length: {len(embedding_vector)}")
+
+# Generate embeddings for multiple texts
+texts = ["Text 1", "Text 2", "Text 3"]
+response = client.embeddings(
+    input=texts,
+    model="nomic-embed-text-v1-GGUF"
+)
+
+for item in response["data"]:
+    print(f"Text {item['index']}: {len(item['embedding'])} dimensions")
+```
+
+**Supported Backends:**
+- ✅ **FLM (FastFlowLM)** - NPU-accelerated on Windows
+- ✅ **llamacpp** (.GGUF models) - CPU/GPU
+- ❌ ONNX/OGA - Not supported
+
 ### 🖼️ Production Showcase: [Sorana](https://tetramatrix.github.io/Sorana/)
 This SDK was extracted from the core engine of [Sorana](https://tetramatrix.github.io/Sorana/), a professional visual workspace for AI. It demonstrates the SDK's capability to handle complex, real-world requirements on AMD Ryzen AI hardware:
 
@@ -83,10 +119,16 @@ This SDK was extracted from the core engine of [Sorana](https://tetramatrix.gith
 
 ## 🛠️ Project Structure
 
-* **client.py:** Main entry point for API interactions.
+* **client.py:** Main entry point for API interactions (chat, embeddings, model management).
 * **port_scanner.py:** Utilities for detecting Lemonade instances across ports (8000-9000).
 * **model_discovery.py:** Logic for fetching and parsing model metadata.
-* **request_builder.py:** Helper functions to construct compliant payloads.
+* **request_builder.py:** Helper functions to construct compliant payloads (chat, embeddings).
+* **utils.py:** Additional utility functions.
+
+## 📚 Documentation
+
+* **[Embeddings API](docs/embeddings_api.md)** - Complete guide for using embeddings
+* [Lemonade Server Docs](https://lemonade-server.ai/docs/server/server_spec/) - Official Lemonade documentation
 
 ## 🤝 Contributing
 
