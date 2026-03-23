@@ -22,6 +22,14 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 
 ## 📦 Installation
 
+Install the latest released version from PyPI:
+
+```bash
+pip install lemonade-python-sdk
+```
+
+Install from source (editable, useful for development):
+
 ```bash
 pip install .
 ```
@@ -31,6 +39,15 @@ Alternatively, you can install it directly from GitHub:
 ```bash
 pip install git+https://github.com/Tetramatrix/lemonade-python-sdk.git
 ```
+
+All variants expose the same interface:
+
+from lemonade_sdk import LemonadeClient, find_available_lemonade_port
+
+Make sure you have:
+
+* Python ≥ 3.8
+* A running Lemonade instance (the SDK will auto‑discover the port where it’s listening).
 
 ## ⚡ Quick Start
 
