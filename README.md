@@ -312,7 +312,7 @@ stream.disconnect()
 
 ### 🖼️ Production Showcase: 
 
-This SDK powers **3 real-world production applications**:
+This SDK powers **4 real-world production applications**:
 
 [Sorana](https://tetramatrix.github.io/Sorana/) — AI Visual Workspace
 * SDK drives semantic AI grouping of files and folders onto a spatial 2D canvas
@@ -325,6 +325,12 @@ This SDK powers **3 real-world production applications**:
 [TabNeuron](https://tetramatrix.github.io/TabNeuron/) — AI-Powered Tab Organizer
 * SDK enables local AI inference for grouping and categorizing browser tabs
 * Desktop companion app + browser extension, demonstrating SDK viability in lightweight client architectures
+
+[Diffron](https://github.com/Tetramatrix/diffron) — AI Git Commit & PR Generator
+* SDK drives automatic generation of Conventional Commit messages and PR descriptions from staged diffs
+* Hooks into prepare-commit-msg globally, works with GitHub Desktop 3.5.5+ and standard Git
+* Uses qwen2.5-it-3b-FLM by default (FastFlowLM, NPU-accelerated) with fallback to any 🍋 Lemonade-compatible model
+* Demonstrates SDK viability in headless/CLI tooling contexts with zero UI overhead
 
 ## 🛠️ Project Structure
 
