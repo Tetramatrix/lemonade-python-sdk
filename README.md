@@ -58,13 +58,17 @@ else:
 if client.health_check():
     print("Lemonade is running!")
 
-# Get server statistics
+# Get server statistics (performance metrics from last request)
 stats = client.get_stats()
 if stats:
-    print(f"Tokens generated: {stats.get('total_tokens', 0)}")
+    print(f"Time to first token: {stats.get('time_to_first_token', 0):.2f}s")
     print(f"Tokens/sec: {stats.get('tokens_per_second', 0):.1f}")
-    print(f"Requests served: {stats.get('requests_served', 0)}")
+    print(f"Input tokens: {stats.get('input_tokens', 0)}")
+    print(f"Output tokens: {stats.get('output_tokens', 0)}")
+    print(f"Prompt tokens: {stats.get('prompt_tokens', 0)}")
 ```
+
+**Available stats fields:** `time_to_first_token`, `tokens_per_second`, `input_tokens`, `output_tokens`, `decode_token_times`, `prompt_tokens`.
 
 ### 2. Chat Completion
 

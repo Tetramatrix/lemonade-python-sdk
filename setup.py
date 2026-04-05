@@ -13,7 +13,7 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setup(
     name="lemonade-python-sdk",
-    version="1.0.4",
+    version="1.0.5",
     author="Tetramatrix",
     author_email="contact@tetramatrix.dev",
     description="A clean interface for interacting with the Lemonade LLM server",
