@@ -79,11 +79,31 @@ class LemonadeClient:
             bool: True if the server is reachable, otherwise False
         """
         try:
-            models = self.list_models()
-            return len(models) >= 0  # If we don't get an error, the server is reachable
-        except:
+            url = f"{self.base_url}/api/v1/health"
+            response = self.session.get(url, timeout=10)
+            return response.status_code == 200
+        except Exception:
             return False
-    
+
+    def get_stats(self) -> Dict[str, Any]:
+        """
+        Retrieves server statistics including token usage, requests served, and performance metrics.
+
+        Returns:
+            Dict[str, Any]: Server stats with token counts, tokens_per_second, etc.
+        """
+        url = f"{self.base_url}/api/v1/stats"
+        try:
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error retrieving stats: {e}")
+            return {}
+        except json.JSONDecodeError as e:
+            print(f"Error parsing stats response: {e}")
+            return {}
+
     def get_current_model(self) -> Optional[str]:
         """
         Retrieves the currently active model from the Lemonade server.

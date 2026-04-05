@@ -11,7 +11,8 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 
 * **Auto-Discovery:** Automatically scans multiple ports and hosts to find active Lemonade instances.
 * **Low-Overhead Architecture:** Designed as a thin, efficient wrapper to leverage Lemonade's C++ performance with minimal Python latency.
-* **Health Checks & Recovery:** Built-in utilities to verify server status and handle connection drops.
+* **Health Checks & Stats:** Lightweight `/api/v1/health` endpoint for connectivity checks plus `get_stats()` for server performance metrics.
+* **Server Statistics:** Retrieve token usage, requests served, and performance metrics via `get_stats()`.
 * **Type-Safe Client:** Full Python type hinting for better developer experience (IDE autocompletion).
 * **Model Management:** Simple API to load, unload, and list models dynamically.
 * **Embeddings API:** Generate text embeddings for semantic search, RAG, and clustering (FLM & llamacpp backends).
@@ -22,14 +23,6 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 
 ## 📦 Installation
 
-Install the latest released version from PyPI:
-
-```bash
-pip install lemonade-python-sdk
-```
-
-Install from source (editable, useful for development):
-
 ```bash
 pip install .
 ```
@@ -39,15 +32,6 @@ Alternatively, you can install it directly from GitHub:
 ```bash
 pip install git+https://github.com/Tetramatrix/lemonade-python-sdk.git
 ```
-
-All variants expose the same interface:
-
-from lemonade_sdk import LemonadeClient, find_available_lemonade_port
-
-Make sure you have:
-
-* Python ≥ 3.8
-* A running Lemonade instance (the SDK will auto‑discover the port where it’s listening).
 
 ## ⚡ Quick Start
 
@@ -66,6 +50,21 @@ if port:
         print(f"Connected to Lemonade on port {port}")
 else:
     print("No Lemonade instance found.")
+```
+
+### 1.1 Health Check & Stats
+
+```python
+# Check if server is alive (uses /api/v1/health endpoint)
+if client.health_check():
+    print("Lemonade is running!")
+
+# Get server statistics
+stats = client.get_stats()
+if stats:
+    print(f"Tokens generated: {stats.get('total_tokens', 0)}")
+    print(f"Tokens/sec: {stats.get('tokens_per_second', 0):.1f}")
+    print(f"Requests served: {stats.get('requests_served', 0)}")
 ```
 
 ### 2. Chat Completion
@@ -312,7 +311,7 @@ stream.disconnect()
 
 ### 🖼️ Production Showcase: 
 
-This SDK powers **4 real-world production applications**:
+This SDK powers **3 real-world production applications**:
 
 [Sorana](https://tetramatrix.github.io/Sorana/) — AI Visual Workspace
 * SDK drives semantic AI grouping of files and folders onto a spatial 2D canvas
@@ -325,12 +324,6 @@ This SDK powers **4 real-world production applications**:
 [TabNeuron](https://tetramatrix.github.io/TabNeuron/) — AI-Powered Tab Organizer
 * SDK enables local AI inference for grouping and categorizing browser tabs
 * Desktop companion app + browser extension, demonstrating SDK viability in lightweight client architectures
-
-[Diffron](https://github.com/Tetramatrix/diffron) — AI Git Commit & PR Generator
-* SDK drives automatic generation of Conventional Commit messages and PR descriptions from staged diffs
-* Hooks into prepare-commit-msg globally, works with GitHub Desktop 3.5.5+ and standard Git
-* Uses qwen2.5-it-3b-FLM by default (FastFlowLM, NPU-accelerated) with fallback to any 🍋 Lemonade-compatible model
-* Demonstrates SDK viability in headless/CLI tooling contexts with zero UI overhead
 
 ## 🛠️ Project Structure
 

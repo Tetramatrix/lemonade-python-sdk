@@ -13,9 +13,9 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setup(
     name="lemonade-python-sdk",
-    version="1.0.3",
-    author="Your Name",
-    author_email="your.email@example.com",
+    version="1.0.4",
+    author="Tetramatrix",
+    author_email="contact@tetramatrix.dev",
     description="A clean interface for interacting with the Lemonade LLM server",
     long_description=long_description,
     long_description_content_type="text/markdown",
