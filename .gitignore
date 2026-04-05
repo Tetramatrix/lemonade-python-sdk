@@ -5,3 +5,5 @@ dist/
 *.egg-info/
 .venv/
 *.bak
+notes.txt
+sync-to-public.bat
