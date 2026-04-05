@@ -11,8 +11,7 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 
 * **Auto-Discovery:** Automatically scans multiple ports and hosts to find active Lemonade instances.
 * **Low-Overhead Architecture:** Designed as a thin, efficient wrapper to leverage Lemonade's C++ performance with minimal Python latency.
-* **Health Checks & Stats:** Lightweight `/api/v1/health` endpoint for connectivity checks plus `get_stats()` for server performance metrics.
-* **Server Statistics:** Retrieve token usage, requests served, and performance metrics via `get_stats()`.
+* **Health Checks & Server Stats:** Lightweight `/api/v1/health` endpoint plus `get_stats()` for token usage, requests served, and performance metrics.
 * **Type-Safe Client:** Full Python type hinting for better developer experience (IDE autocompletion).
 * **Model Management:** Simple API to load, unload, and list models dynamically.
 * **Embeddings API:** Generate text embeddings for semantic search, RAG, and clustering (FLM & llamacpp backends).
