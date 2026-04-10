@@ -9,11 +9,11 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 
 ## 🚀 Key Features
 
-* **Auto-Discovery:** Automatically scans multiple ports and hosts to find active Lemonade instances.
+* **Auto-Discovery:** Automatically scans 8 discrete ports (8000, 8020, 8040, 8060, 8080, 9000, 13305, 11434) to find active Lemonade instances. Distinguishes between real Ollama and Lemonade on port 11434.
 * **Low-Overhead Architecture:** Designed as a thin, efficient wrapper to leverage Lemonade's C++ performance with minimal Python latency.
 * **Health Checks & Server Stats:** Lightweight `/api/v1/health` endpoint plus `get_stats()` for token usage, requests served, and performance metrics.
 * **Type-Safe Client:** Full Python type hinting for better developer experience (IDE autocompletion).
-* **Model Management:** Simple API to load, unload, and list models dynamically.
+* **Model Labels & Capabilities:** Detect vision, reasoning, coding, and other model capabilities via the official Lemonade labels system.
 * **Embeddings API:** Generate text embeddings for semantic search, RAG, and clustering (FLM & llamacpp backends).
 * **Audio API:** Whisper speech-to-text and Kokoro text-to-speech.
 * **Reranking API:** Reorder documents by relevance for better RAG results.
@@ -95,6 +95,62 @@ for m in models:
 
 # Load a specific model into memory
 client.load_model("Mistral-7B-v0.1")
+```
+
+### 3.1 Model Labels & Capability Detection
+
+Lemonade models include a `labels` array that describes their capabilities. The SDK provides `ModelInfo` objects for easy capability checking.
+
+```python
+from lemonade_sdk import ModelInfo, LemonadeClient
+
+client = LemonadeClient()
+
+# Get all models with capability info
+models = client.list_models_with_info()
+for model in models:
+    print(f"{model.name}: {model.get_capabilities_summary()}")
+
+# Check if a specific model supports vision
+if client.has_vision("Qwen3.5-122B"):
+    print("This model can process images!")
+
+# Find all vision models
+vision_models = client.list_vision_models()
+for m in vision_models:
+    print(f"Vision model: {m.name}")
+
+# Check other capabilities
+print(client.has_reasoning("Qwen3.5-122B"))   # Extended thinking
+print(client.has_tool_calling("Qwen3.5-122B")) # Function calling
+print(client.has_coding("Qwen3.5-122B"))       # Code generation
+print(client.has_embeddings(model_id))          # Embedding model
+print(client.has_reranking(model_id))           # Reranking model
+print(client.has_image_generation(model_id))    # Stable Diffusion
+```
+
+**Official Lemonade Labels:**
+
+| Label | Meaning |
+|---|---|
+| `vision` | Model supports image input (VLM) |
+| `reasoning` | Model uses extended thinking/chain-of-thought |
+| `coding` | Optimized for code generation tasks |
+| `tool-calling` | Supports function/tool calling |
+| `embeddings` | Text embedding model |
+| `reranking` | Reranking model (for RAG pipelines) |
+| `image` | Image generation model (Stable Diffusion etc.) |
+| `hot` | Featured/recommended by Lemonade |
+| `custom` | User-added model |
+
+You can also use labels directly:
+
+```python
+from lemonade_sdk import LABEL_VISION, ModelInfo
+
+model = ModelInfo.from_api_response(api_data)
+if model.has_label(LABEL_VISION):
+    print("This is a vision model")
 ```
 
 ### 4. Embeddings (NEW)
@@ -331,7 +387,7 @@ This SDK powers **3 real-world production applications**:
 ## 🛠️ Project Structure
 
 * **client.py:** Main entry point for API interactions (chat, embeddings, audio, reranking, images, model management).
-* **port_scanner.py:** Utilities for detecting Lemonade instances across ports (8000-9000).
+* **port_scanner.py:** Utilities for detecting Lemonade instances across 8 discrete ports (8000, 8020, 8040, 8060, 8080, 9000, 13305, 11434).
 * **model_discovery.py:** Logic for fetching and parsing model metadata.
 * **request_builder.py:** Helper functions to construct compliant payloads (chat, embeddings, audio, reranking, images).
 * **audio_stream.py:** WebSocket client for real-time audio transcription with VAD.

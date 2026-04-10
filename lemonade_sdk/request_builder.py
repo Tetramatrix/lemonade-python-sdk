@@ -64,7 +64,7 @@ def build_model_load_payload(model_name: str, **kwargs) -> Dict[str, Any]:
     return payload
 
 
-def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, str]] = None, session: Optional[requests.Session] = None, method: str = "POST") -> Dict[str, Any]:
+def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, str]] = None, session: Optional[requests.Session] = None, method: str = "POST", timeout: int = 30) -> Dict[str, Any]:
     """
     Sends a request to the Lemonade server.
 
@@ -74,6 +74,7 @@ def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, 
         headers (Optional[Dict[str, str]]): Optional headers for the request
         session (Optional[requests.Session]): Optional session for the request
         method (str): HTTP method to use ("POST" or "GET")
+        timeout (int): Request timeout in seconds (default: 30)
 
     Returns:
         Dict[str, Any]: The response from the server
@@ -88,9 +89,9 @@ def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, 
 
     try:
         if method.upper() == "POST":
-            response = req_session.post(url, json=payload, headers=headers, timeout=30)
+            response = req_session.post(url, json=payload, headers=headers, timeout=timeout)
         elif method.upper() == "GET":
-            response = req_session.get(url, headers=headers, timeout=30, params=payload if payload else None)
+            response = req_session.get(url, headers=headers, timeout=timeout, params=payload if payload else None)
         else:
             return {"error": f"Unsupported HTTP method: {method}"}
         

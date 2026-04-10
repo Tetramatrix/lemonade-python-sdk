@@ -6,6 +6,7 @@ import requests
 import json
 from typing import List, Dict, Any, Optional
 from .port_scanner import find_available_lemonade_port
+from .model_info import ModelInfo
 
 
 def discover_lemonade_models(base_url: str = "http://localhost:8000") -> List[Dict[str, Any]]:
@@ -54,7 +55,11 @@ def discover_lemonade_models(base_url: str = "http://localhost:8000") -> List[Di
                 'status': 'Available',
                 'size_gb': 0,  # Lemonade doesn't provide size info in the API
                 'local_path': f"lemonade://{model.get('name', model.get('id', 'unknown'))}",
-                'backend': 'lemonade'
+                'backend': 'lemonade',
+                # New: label and capability metadata
+                'labels': model.get('labels', []),
+                'recipe': model.get('recipe', ''),
+                'mmproj': model.get('mmproj'),
             }
             formatted_models.append(formatted_model)
         
@@ -123,9 +128,40 @@ def verify_model_availability(model_name: str, base_url: str = "http://localhost
         bool: True if the model is available, otherwise False
     """
     available_models = discover_lemonade_models(base_url)
-    
+
     for model in available_models:
         if model['name'] == model_name or model['id'] == model_name:
             return True
-    
+
     return False
+
+
+def discover_lemonade_models_with_info(base_url: str = "http://localhost:8000") -> List[ModelInfo]:
+    """
+    Scans for available models on the Lemonade server and returns ModelInfo objects.
+
+    Unlike discover_lemonade_models(), this returns rich ModelInfo objects with
+    label-based capability checking methods (has_vision(), has_reasoning(), etc.).
+
+    Args:
+        base_url (str): The base URL of the Lemonade server
+
+    Returns:
+        List[ModelInfo]: List of found models as ModelInfo objects
+    """
+    raw_models = discover_lemonade_models(base_url)
+
+    # Extract raw model data from the formatted dicts
+    model_infos = []
+    for model in raw_models:
+        # The raw API data is stored in the formatted dict with our additions
+        raw_data = {
+            'id': model['id'],
+            'name': model['name'],
+            'labels': model.get('labels', []),
+            'recipe': model.get('recipe', ''),
+            'mmproj': model.get('mmproj'),
+        }
+        model_infos.append(ModelInfo.from_api_response(raw_data))
+
+    return model_infos

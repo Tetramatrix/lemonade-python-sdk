@@ -7,6 +7,7 @@ import json
 from typing import Dict, List, Optional, Any
 from .request_builder import build_chat_completion_payload, send_request, build_embedding_payload, build_transcription_payload, send_multipart_request, build_speech_payload, build_reranking_payload, build_image_generation_payload
 from .model_discovery import get_active_model
+from .model_info import ModelInfo
 from .audio_stream import WhisperWebSocketClient
 
 
@@ -47,6 +48,87 @@ class LemonadeClient:
         except json.JSONDecodeError as e:
             print(f"Error parsing response: {e}")
             return []
+
+    def get_model_info(self, model_id: str) -> Optional[ModelInfo]:
+        """
+        Get detailed info and capabilities for a specific model.
+
+        Args:
+            model_id: The model identifier (e.g., "user.Qwen3.5-122B-A10B-UD-IQ3_S.gguf")
+
+        Returns:
+            ModelInfo with labels and capability methods, or None if not found
+        """
+        url = f"{self.base_url}/api/v1/models"
+        try:
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            models = data.get('data', [])
+
+            for model in models:
+                mid = model.get('id', model.get('name', ''))
+                if mid == model_id or model.get('name', '') == model_id:
+                    return ModelInfo.from_api_response(model)
+
+            return None
+        except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+            print(f"Error retrieving model info for {model_id}: {e}")
+            return None
+
+    def list_models_with_info(self) -> List[ModelInfo]:
+        """
+        Get all models as ModelInfo objects with capability checking.
+
+        Returns:
+            List[ModelInfo]: All available models with labels and helper methods
+        """
+        models = self.list_models()
+        return [ModelInfo.from_api_response(m) for m in models]
+
+    def list_vision_models(self) -> List[ModelInfo]:
+        """Get all models that support image input (VLM)."""
+        return [m for m in self.list_models_with_info() if m.has_vision()]
+
+    def has_vision(self, model_id: str) -> bool:
+        """Check if a specific model supports image input (VLM)."""
+        info = self.get_model_info(model_id)
+        return info.has_vision() if info else False
+
+    def has_reasoning(self, model_id: str) -> bool:
+        """Check if a specific model uses extended thinking/chain-of-thought."""
+        info = self.get_model_info(model_id)
+        return info.has_reasoning() if info else False
+
+    def has_coding(self, model_id: str) -> bool:
+        """Check if a specific model is optimized for code generation."""
+        info = self.get_model_info(model_id)
+        return info.has_coding() if info else False
+
+    def has_tool_calling(self, model_id: str) -> bool:
+        """Check if a specific model supports function/tool calling."""
+        info = self.get_model_info(model_id)
+        return info.has_tool_calling() if info else False
+
+    def has_embeddings(self, model_id: str) -> bool:
+        """Check if a specific model is a text embedding model."""
+        info = self.get_model_info(model_id)
+        return info.has_embeddings() if info else False
+
+    def has_reranking(self, model_id: str) -> bool:
+        """Check if a specific model is a reranking model."""
+        info = self.get_model_info(model_id)
+        return info.has_reranking() if info else False
+
+    def has_image_generation(self, model_id: str) -> bool:
+        """Check if a specific model supports image generation."""
+        info = self.get_model_info(model_id)
+        return info.has_image_generation() if info else False
+
+    def get_model_capabilities(self, model_id: str) -> str:
+        """Get a human-readable summary of a model's capabilities."""
+        info = self.get_model_info(model_id)
+        return info.get_capabilities_summary() if info else "Model not found"
     
     def chat_completion(self, model: str, messages: List[Dict[str, str]], **kwargs) -> Dict[str, Any]:
         """
@@ -56,16 +138,18 @@ class LemonadeClient:
             model (str): The name of the model to use
             messages (List[Dict[str, str]]): The messages for the conversation
             **kwargs: Additional parameters for the request
+                timeout (int): Request timeout in seconds (default: 30, use 120+ for vision)
 
         Returns:
             Dict[str, Any]: The response from the server
         """
         url = f"{self.base_url}/api/v1/chat/completions"
 
+        timeout = kwargs.pop('timeout', 30)
         payload = build_chat_completion_payload(model, messages, **kwargs)
 
         try:
-            response = send_request(url, payload, session=self.session)
+            response = send_request(url, payload, session=self.session, timeout=timeout)
             return response
         except Exception as e:
             print(f"Error in chat completion request: {e}")
