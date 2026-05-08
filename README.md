@@ -5,7 +5,7 @@
 
 A robust, production-grade Python wrapper for the **Lemonade C++ Backend**. 
 
-This SDK provides a clean, pythonic interface for interacting with local LLMs running on Lemonade. It was built to power **Sorana** (a visual workspace for AI), extracting the core integration logic into a standalone, open-source library for the developer community.
+This SDK provides a clean, pythonic interface for interacting with local LLMs running on Lemonade. It was built to power the **Sorana** (a personal AI knowledge workspace), extracting the core integration logic into a standalone, open-source library for the developer community.
 
 ## 🚀 Key Features
 
@@ -372,8 +372,8 @@ stream.disconnect()
 
 This SDK powers **3 real-world production applications**:
 
-[Sorana](https://tetramatrix.github.io/Sorana/) — AI Visual Workspace
-* SDK drives semantic AI grouping of files and folders onto a spatial 2D canvas
+[Sorana](https://tetramatrix.github.io/Sorana/) — personal AI knowledge workspace
+* SDK drives your personal AI knowledge workspace, a second brain that actually acts.
 * SDK handles auto-discovery and connection to local Lemonade instances (zero config)
 
 [Aicono](https://tetramatrix.github.io/Aicono/) — AI Desktop Icon Organizer *(Featured in [CHIP Magazine](https://www.chip.de/downloads/Aicono_186527264.html) 🇩🇪)*
