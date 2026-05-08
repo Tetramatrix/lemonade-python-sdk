@@ -5,7 +5,7 @@
 
 A robust, production-grade Python wrapper for the **Lemonade C++ Backend**. 
 
-This SDK provides a clean, pythonic interface for interacting with local LLMs running on Lemonade. It was built to power the **Sorana** (a personal AI knowledge workspace), extracting the core integration logic into a standalone, open-source library for the developer community.
+This SDK provides a clean, pythonic interface for interacting with local LLMs running on Lemonade. It was built to power the **[Sorana](https://tetramatrix.github.io/Sorana/)**, a personal AI knowledge workspace, extracting the core integration logic into a standalone, open-source library for the developer community.
 
 ## 🚀 Key Features
 
