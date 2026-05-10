@@ -5,7 +5,7 @@
 
 A robust, production-grade Python wrapper for the **Lemonade C++ Backend**. 
 
-This SDK provides a clean, pythonic interface for interacting with local LLMs running on Lemonade. It was built to power the **[Sorana](https://tetramatrix.github.io/Sorana/)**, a personal AI knowledge workspace, extracting the core integration logic into a standalone, open-source library for the developer community.
+This SDK provides a clean, pythonic interface for interacting with local LLMs running on Lemonade. It was built to power the **Sorana** (a personal AI knowledge workspace), extracting the core integration logic into a standalone, open-source library for the developer community.
 
 ## 🚀 Key Features
 
@@ -378,7 +378,7 @@ This SDK powers **3 real-world production applications**:
 
 [Aicono](https://tetramatrix.github.io/Aicono/) — AI Desktop Icon Organizer *(Featured in [CHIP Magazine](https://www.chip.de/downloads/Aicono_186527264.html) 🇩🇪)*
 * SDK drives AI inference for grouping and categorizing desktop icons
-* Reached millions of readers via [CHIP](https://www.chip.de/downloads/Aicono_186527264.html), one of Germany's largest IT publications
+* Reached millions of readers via [COMPUTERBILD](https://www.computerbild.de/artikel/Tipps-Windows-Aicono-Gratis-Tool-fuer-Windows-sortiert-Desktop-Dateien-mit-KI-00879-40830261.html) and [CHIP](https://www.chip.de/downloads/Aicono_186527264.html), two of Germany's largest IT publications
 
 [TabNeuron](https://tetramatrix.github.io/TabNeuron/) — AI-Powered Tab Organizer
 * SDK enables local AI inference for grouping and categorizing browser tabs
