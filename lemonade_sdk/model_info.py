@@ -19,6 +19,10 @@ LABEL_RERANKING = "reranking"
 LABEL_IMAGE = "image"
 LABEL_HOT = "hot"
 LABEL_CUSTOM = "custom"
+LABEL_TRANSCRIPTION = "transcription"
+LABEL_REALTIME_TRANSCRIPTION = "realtime-transcription"
+LABEL_STT = "stt"
+LABEL_SPEECH = "speech"
 
 # Human-readable label descriptions
 LABEL_DESCRIPTIONS: Dict[str, str] = {
@@ -31,6 +35,10 @@ LABEL_DESCRIPTIONS: Dict[str, str] = {
     LABEL_IMAGE: "Image generation model (Stable Diffusion etc.)",
     LABEL_HOT: "Featured/recommended by Lemonade",
     LABEL_CUSTOM: "User-added model",
+    LABEL_TRANSCRIPTION: "Audio transcription model (speech-to-text)",
+    LABEL_REALTIME_TRANSCRIPTION: "Real-time audio transcription model",
+    LABEL_STT: "Speech-to-text model",
+    LABEL_SPEECH: "Speech-capable model (STT or TTS)",
 }
 
 
@@ -91,6 +99,18 @@ class ModelInfo:
     def has_image_generation(self) -> bool:
         """Check if the model supports image generation (Stable Diffusion etc.)."""
         return LABEL_IMAGE in self.labels
+
+    def has_audio_transcription(self) -> bool:
+        """Check if the model supports audio transcription (speech-to-text).
+        
+        Uses ONLY official Lemonade labels, no string matching.
+        """
+        return (
+            LABEL_TRANSCRIPTION in self.labels
+            or LABEL_REALTIME_TRANSCRIPTION in self.labels
+            or LABEL_STT in self.labels
+            or LABEL_SPEECH in self.labels
+        )
 
     def is_hot(self) -> bool:
         """Check if the model is featured/recommended by Lemonade."""

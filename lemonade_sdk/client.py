@@ -188,14 +188,14 @@ class LemonadeClient:
             print(f"Error parsing stats response: {e}")
             return {}
 
-    def get_current_model(self) -> Optional[str]:
+    def get_current_model(self, *, strict: bool = False) -> Optional[str]:
         """
         Retrieves the currently active model from the Lemonade server.
 
         Returns:
             Optional[str]: The name of the current model or None
         """
-        return get_active_model(self.base_url)
+        return get_active_model(self.base_url, strict=strict)
     
     def load_model(self, model_name: str, **kwargs) -> Dict[str, Any]:
         """
@@ -208,18 +208,17 @@ class LemonadeClient:
         Returns:
             Dict[str, Any]: Response from the server
         """
-        url = f"{self.base_url}/api/v1/load_model"
-
         payload = {
-            "model": model_name,
+            "model_name": model_name,
             **kwargs
         }
 
+        url = f"{self.base_url}/api/v1/load"
         try:
-            response = send_request(url, payload, session=self.session)
+            response = send_request(url, payload, session=self.session, timeout=300)
             return response
         except Exception as e:
-            print(f"Error loading model: {e}")
+            print(f"Error loading model via {url}: {e}")
             return {"error": str(e)}
     
     def unload_model(self) -> Dict[str, Any]:
@@ -229,13 +228,12 @@ class LemonadeClient:
         Returns:
             Dict[str, Any]: Response from the server
         """
-        url = f"{self.base_url}/api/v1/unload_model"
-
+        url = f"{self.base_url}/api/v1/unload"
         try:
-            response = send_request(url, {}, session=self.session)
+            response = send_request(url, {}, session=self.session, timeout=120)
             return response
         except Exception as e:
-            print(f"Error unloading model: {e}")
+            print(f"Error unloading model via {url}: {e}")
             return {"error": str(e)}
 
     def embeddings(self, input: str, model: str, **kwargs) -> Dict[str, Any]:
@@ -325,18 +323,19 @@ class LemonadeClient:
     def list_audio_models(self) -> List[Dict[str, Any]]:
         """
         Retrieves audio models (Whisper + Kokoro) from the Lemonade server.
-        Filters models by the 'audio' label.
+        Filters models by 'audio', 'transcription', or 'realtime-transcription' labels.
 
         Returns:
             List[Dict[str, Any]]: List of available audio models
         """
         all_models = self.list_models()
 
-        # Filter models that have the 'audio' label
+        # Filter models that have audio/transcription capability labels
+        AUDIO_LABELS = {"audio", "transcription", "realtime-transcription"}
         audio_models = []
         for model in all_models:
             labels = model.get("labels", [])
-            if labels and "audio" in labels:
+            if labels and AUDIO_LABELS.intersection(labels):
                 audio_models.append(model)
 
         return audio_models

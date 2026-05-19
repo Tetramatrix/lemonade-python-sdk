@@ -72,7 +72,7 @@ def discover_lemonade_models(base_url: str = "http://localhost:8000") -> List[Di
         return []
 
 
-def get_active_model(base_url: str = "http://localhost:8000") -> Optional[str]:
+def get_active_model(base_url: str = "http://localhost:8000", *, strict: bool = False) -> Optional[str]:
     """
     Retrieves the currently active model from the Lemonade server.
 
@@ -83,7 +83,7 @@ def get_active_model(base_url: str = "http://localhost:8000") -> Optional[str]:
         Optional[str]: The name of the active model or None
     """
     # Lemonade has no direct endpoint for the active model,
-    # so we try various known endpoints
+    # so we try various known endpoints.
     endpoints_to_try = [
         f"{base_url}/api/v1/current_model",
         f"{base_url}/api/v1/model",
@@ -108,7 +108,10 @@ def get_active_model(base_url: str = "http://localhost:8000") -> Optional[str]:
         except (requests.exceptions.RequestException, json.JSONDecodeError):
             continue
 
-    # As a fallback, try to get the first available model
+    if strict:
+        return None
+
+    # As a fallback, try to get the first available model.
     available_models = discover_lemonade_models(base_url)
     if available_models:
         return available_models[0]['name']

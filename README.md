@@ -19,6 +19,7 @@ This SDK provides a clean, pythonic interface for interacting with local LLMs ru
 * **Reranking API:** Reorder documents by relevance for better RAG results.
 * **Image Generation:** Create images from text prompts using Stable Diffusion.
 * **WebSocket Streaming:** Real-time audio transcription with VAD.
+* **Model Cache Utilities:** Check local HuggingFace cache for installed models without starting the server.
 
 ## 📦 Installation
 
@@ -140,6 +141,10 @@ print(client.has_image_generation(model_id))    # Stable Diffusion
 | `embeddings` | Text embedding model |
 | `reranking` | Reranking model (for RAG pipelines) |
 | `image` | Image generation model (Stable Diffusion etc.) |
+| `transcription` | Audio transcription model (speech-to-text) |
+| `realtime-transcription` | Real-time audio transcription model |
+| `stt` | Speech-to-text model |
+| `speech` | Speech-capable model (STT or TTS) |
 | `hot` | Featured/recommended by Lemonade |
 | `custom` | User-added model |
 
@@ -152,6 +157,56 @@ model = ModelInfo.from_api_response(api_data)
 if model.has_label(LABEL_VISION):
     print("This is a vision model")
 ```
+
+### 3.2 Model Installation & Cache Utilities - NEW
+
+Check if models are installed in your local HuggingFace cache without starting the Lemonade server.
+
+```python
+from lemonade_sdk import (
+    get_hf_cache_dir,
+    find_model_in_cache,
+    is_model_installed,
+    list_installed_models,
+    is_whisper_model_installed,
+    is_llm_model_installed,
+)
+
+# Get the HuggingFace cache directory
+cache_dir = get_hf_cache_dir()
+print(f"Cache location: {cache_dir}")
+
+# Check if a specific model file exists
+path = find_model_in_cache(
+    repo_id="ggerganov/whisper.cpp",
+    filename="ggml-large-v3-turbo.bin"
+)
+if path:
+    print(f"Found at: {path}")
+
+# Quick boolean check
+if is_model_installed("ggerganov/whisper.cpp", "ggml-large-v3-turbo.bin"):
+    print("Whisper model is installed!")
+
+# Check Whisper models by name (handles naming variations)
+if is_whisper_model_installed("Whisper-Large-v3-Turbo"):
+    print("Whisper Large v3 Turbo is ready")
+
+# Check LLM models with fuzzy matching
+if is_llm_model_installed("Qwen3.5-122B-A10B-UD-IQ3_S"):
+    print("LLM model is installed")
+
+# List all installed model files
+models = list_installed_models()
+for m in models:
+    print(f"{m['repo_id']}/{m['filename']} ({m['size_bytes'] / 1e9:.1f} GB)")
+```
+
+**Use cases:**
+- Verify model downloads completed before starting Lemonade
+- Build custom model managers with install-state awareness
+- Scan cache for disk usage reporting
+- Pre-flight checks before expensive operations
 
 ### 4. Embeddings (NEW)
 
@@ -389,9 +444,12 @@ This SDK powers **3 real-world production applications**:
 * **client.py:** Main entry point for API interactions (chat, embeddings, audio, reranking, images, model management).
 * **port_scanner.py:** Utilities for detecting Lemonade instances across 8 discrete ports (8000, 8020, 8040, 8060, 8080, 9000, 13305, 11434).
 * **model_discovery.py:** Logic for fetching and parsing model metadata.
+* **model_info.py:** ModelInfo class with capability detection via labels (vision, reasoning, coding, etc.).
+* **model_install_check.py:** Utilities for checking HuggingFace cache for installed models.
 * **request_builder.py:** Helper functions to construct compliant payloads (chat, embeddings, audio, reranking, images).
 * **audio_stream.py:** WebSocket client for real-time audio transcription with VAD.
 * **utils.py:** Additional utility functions.
+* **model_recovery.py:** LemonadeModelRecovery class for handling model installation and recovery.
 
 ## 🤝 Contributing
 

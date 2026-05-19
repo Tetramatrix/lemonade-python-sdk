@@ -94,8 +94,13 @@ def send_request(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, 
             response = req_session.get(url, headers=headers, timeout=timeout, params=payload if payload else None)
         else:
             return {"error": f"Unsupported HTTP method: {method}"}
-        
+
         response.raise_for_status()
+
+        # 204 No Content is a valid success response (e.g. for unload)
+        if response.status_code == 204:
+            return {"status": "ok"}
+
         return response.json()
     except requests.exceptions.HTTPError as e:
         print(f"HTTP error in request to {url}: {e}")
